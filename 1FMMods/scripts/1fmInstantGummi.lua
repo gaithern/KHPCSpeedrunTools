@@ -3,10 +3,10 @@ LUAGUI_AUTH = "denhonator"
 LUAGUI_DESC = "Instantly arrive at gummi destination"
 
 local offset = 0x3A0606
-local worldWarpBase = 0x50B940
-local cutsceneFlagBase = 0x2DE65D0-0x200 - offset
-local djProgressFlag = 0x2DE79D0+0x6C+0x40
-local neverlandProgressFlag = 0x2DE79D0+0x6C+0xED
+local worldWarpBase = 0x50ECD0
+local cutsceneFlagBase = 0x2DE9F60-0x200 - offset
+--local djProgressFlag = 0x2DE79D0+0x6C+0x40 UNUSED
+--local neverlandProgressFlag = 0x2DE79D0+0x6C+0xED UNUSED
 
 local canExecute = false
 
@@ -24,13 +24,13 @@ function _OnFrame()
 		goto done
 	end
 
-	local selection = ReadInt(0x503CEC-offset)
+	local selection = ReadInt(0x50707C-offset)
 	local realSelection = selection
-	local realWorld = ReadByte(0x503C04-offset)
-	local soraWorld = ReadByte(0x233CADC-offset)
-	local room = ReadByte(0x25346D0-offset)
+	local realWorld = ReadByte(0x506F94-offset)
+	local soraWorld = ReadByte(0x233FE84-offset)
+	local room = ReadByte(0x233FE8C-offset)
 	
-	local monstroOpen = ReadByte(0x2DE78CA-offset) > 1
+	local monstroOpen = ReadByte(0x2DEB25A-offset) > 1
 	local neverlandState = ReadByte(cutsceneFlagBase+0xB0D) < 0x14
 	local deepJungleState = ReadByte(cutsceneFlagBase+0xB05) < 0x10
 
@@ -40,7 +40,7 @@ function _OnFrame()
 	WriteByte(worldWarpBase+0x9C-offset, neverlandState and 0x18 or 0x25)
 
 	if room > 0 and soraWorld ~= selection then
-		WriteInt(0x503CEC-offset, soraWorld)
+		WriteInt(0x50707C-offset, soraWorld)
 	end
 	
 	-- Replace HT and Atlantica with Monstro at first
@@ -51,23 +51,23 @@ function _OnFrame()
 	-- Change warp to Hollow Bastion
 	if selection == 25 then 
 		selection = 15
-		WriteInt(0x503CEC-offset, selection)
+		WriteInt(0x50707C-offset, selection)
 	end
 	-- Change warp to Agrabah
 	if selection == 21 then
 		selection = 8
-		WriteInt(0x503CEC-offset, selection)
+		WriteInt(0x50707C-offset, selection)
 	end
 	
 	-- Go directly to location
-	local curDest = ReadInt(0x5041F0-offset)
+	local curDest = ReadInt(0x507580-offset)
 	if curDest < 40 then
 		selection = selection > 20 and 0 or selection
-		WriteInt(0x5041F0-offset, selection)
-		WriteInt(0x503C00-offset, selection)
-		WriteInt(0x2685EEC-offset, 0)
+		WriteInt(0x507580-offset, selection)
+		WriteInt(0x506F90-offset, selection)
+		WriteInt(0x268987C-offset, 0)
 	else
-		WriteInt(0x503C00-offset, realSelection)
+		WriteInt(0x506F90-offset, realSelection)
 	end
 	
 	::done::
